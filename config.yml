@@ -1,0 +1,48 @@
+---
+- hosts: all
+  become: true
+  tasks:
+
+  - name: install python3 and pip3 for all Manage Nodes
+    package:
+      name:
+        - python3
+        - python3-pip
+      state: latest
+      update_cache: yes
+
+  - debug: var=ansible_python_interpreter
+  - debug: var=ansible_python_version
+
+  - debug: var=ansible_python-pip_interpreter
+  - debug: var=ansible_python-pip_version
+
+  - name: installing java open-jdk for Ubuntu and CentOS
+    apt:
+      name:
+        - default-jre
+      state: latest
+      update_cache: yes
+    when: ansible_distribution == "Ubuntu"
+
+  - name: installing java open-jdk for CentOS
+    dnf:
+      name:
+        - java
+      state: latest
+      update_cache: yes
+    when: ansible_distribution == "CentOS"
+
+  - name: MOTD BANNER
+    shell: echo "Ansible Managed node by sewan" > $HOME/variable.txt
+    register: motd_output
+  - debug: var=motd_output
+
+  - name: creating a user named 'Lhana Roads' with a variable
+    ansible.builtin.user:
+      name: lhanaroads
+      comment: LhanaRoads
+      uid: 1088
+      group: users
+      createhome: yes
+      home: /home/myRoad 
